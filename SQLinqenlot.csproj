@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{F9A41AB0-962D-4134-920B-D98E0F50FA67}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SQLinqenlot</RootNamespace>
+    <AssemblyName>SQLinqenlot</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.85.5.452, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\DLL\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="itextsharp, Version=4.1.2.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\DLL\itextsharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Net">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ApplicationParameters.cs" />
+    <Compile Include="Archiving\ArchiveConfig.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Archiving\ArchiveControl.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Archiving\ArchivedData.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Archiving\FileSystemArchiveMethod.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Archiving\IArchiveMethod.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Archiving\SqlArchiveMethod.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Audit.cs" />
+    <Compile Include="AuditDetailBase.cs" />
+    <Compile Include="AuditHeaderBase.cs" />
+    <Compile Include="CachedQuery.cs" />
+    <Compile Include="DBLocator.cs" />
+    <Compile Include="DBMetaData.cs" />
+    <Compile Include="Enumerations.cs" />
+    <Compile Include="Exceptions.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="FileOfObjects.cs" />
+    <Compile Include="FreezeAndThaw.cs" />
+    <Compile Include="LinqBatchPost\ExpressionVisitor.cs" />
+    <Compile Include="LinqBatchPost\LinqToSqlExtensions.cs" />
+    <Compile Include="LinqedTable.cs" />
+    <Compile Include="GenericTable.cs" />
+    <Compile Include="LinqedTableDataContext.cs" />
+    <Compile Include="MiscUtils.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SyntacClient.cs" />
+    <Compile Include="ReadOnlyLinqedTable.cs" />
+    <Compile Include="RecurringEvent.cs" />
+    <Compile Include="SemiSharedLinqedTable.cs" />
+    <Compile Include="SqlRecover.cs" />
+    <Compile Include="SqlUtil.cs" />
+    <Compile Include="UniStatic.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
