@@ -84,7 +84,7 @@ namespace SQLinqenlot {
 			}
 
 			//go to EISS and only get the GLOBAL
-			sql = new SqlUtil(TDatabase.Syntac);
+			sql = new SqlUtil(TDatabase.Shared);
 			dt = sql.ExecuteSingleResultSetSQLQuery("select * from ApplicationParameter");
 			foreach (DataRow r in dt.Rows) {
 				AppName = (string)DataUtils.BlankIfNull(r["App"]);

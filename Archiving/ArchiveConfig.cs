@@ -146,7 +146,7 @@ namespace SQLinqenlot.Archiving {
 		#endregion
 
 		#region constructor
-		public ArchiveConfig() : base("ArchiveConfig", TDatabase.Syntac) { }
+		public ArchiveConfig() : base("ArchiveConfig", TDatabase.Shared) { }
 		#endregion
 
 		#region static methods
@@ -157,7 +157,7 @@ namespace SQLinqenlot.Archiving {
 			if (mCachedQuery == null) {
 				mCache = new Dictionary<string, ArchiveConfig>();
 				CachedQuery.CacheUpdatedDelegate cb = new CachedQuery.CacheUpdatedDelegate(CacheCB);
-				mCachedQuery = new CachedQuery(TDatabase.Syntac, "select * from ArchiveConfig", 180, cb);
+				mCachedQuery = new CachedQuery(TDatabase.Shared, "select * from ArchiveConfig", 180, cb);
 				mCachedQuery.AllowNoRows = true;
 			}
 

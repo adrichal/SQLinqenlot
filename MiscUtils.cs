@@ -576,7 +576,7 @@ namespace SQLinqenlot {
 				if (DateTime.Now > __NextTimeCheck || ForceSync) {
 					// time to refresh
 					try {
-						SqlUtil sql = new SqlUtil(TDatabase.Syntac);
+						SqlUtil sql = new SqlUtil(TDatabase.Shared);
 						DateTime dServerDate = DataUtils.ToDate(sql.ExecuteScalarResultSetSQLQuery("select getdate()")).Value;
 						__TimeDiff = DateTime.Now.Subtract(dServerDate);
 						__NextTimeCheck = DateTime.Now.AddMinutes(mnFRESHNESS_MINUTES);

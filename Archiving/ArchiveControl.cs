@@ -107,12 +107,12 @@ namespace SQLinqenlot.Archiving {
 		private static Dictionary<string, ArchiveControlList> mArchive = new Dictionary<string, ArchiveControlList>();
 
 		private static SqlUtil SQL {
-			get { return SqlUtil.Get(TDatabase.Syntac); }
+			get { return SqlUtil.Get(TDatabase.Shared); }
 		}
 
 		#endregion
 
-		private ArchiveControl() : base("ArchiveControl", TDatabase.Syntac) { }
+		private ArchiveControl() : base("ArchiveControl", TDatabase.Shared) { }
 
 		public ArchiveControl(DataRow r)
 			: this() {
@@ -249,7 +249,7 @@ namespace SQLinqenlot.Archiving {
 		private static void LoadArchiveControl() {
 			if (mCachedQuery == null) {
 				CachedQuery.CacheUpdatedDelegate cb = new CachedQuery.CacheUpdatedDelegate(CacheCB);
-				mCachedQuery = new CachedQuery(TDatabase.Syntac, "select * from ArchiveControl order by id asc", 180, cb);
+				mCachedQuery = new CachedQuery(TDatabase.Shared, "select * from ArchiveControl order by id asc", 180, cb);
 				mCachedQuery.AllowErrors = 2;
 			}
 

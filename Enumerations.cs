@@ -14,8 +14,7 @@ namespace SQLinqenlot {
 	public enum TDatabase {
 		Unknown,
 		Client,
-		Syntac,
-		V1,
+		Shared,
 	}
 
 	public enum TClientStatus : byte {
