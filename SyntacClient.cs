@@ -18,7 +18,7 @@ namespace SQLinqenlot {
 		}
 
 		public SyntacClient()
-			: base("Client", TDatabase.Syntac) {
+			: base("Client", TDatabase.Shared) {
 		}
 
 		#region accessors
@@ -110,7 +110,7 @@ namespace SQLinqenlot {
 				if (mCachedQuery == null) {
 					mClientCache = new List<SyntacClient>();
 					CachedQuery.CacheUpdatedDelegate cb = new CachedQuery.CacheUpdatedDelegate(CacheCB);
-					mCachedQuery = new CachedQuery(TDatabase.Syntac, "select * from Client order by ID", 60, cb);
+					mCachedQuery = new CachedQuery(TDatabase.Shared, "select * from Client order by ID", 60, cb);
 				}
 
 				mCachedQuery.CheckCache();
