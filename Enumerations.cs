@@ -34,12 +34,6 @@ namespace SQLinqenlot {
 		HalfYear = 8,
 	}
 
-	public enum THealthProgram : byte {
-		EarlyIntervention = 1,
-		CPSE = 2,
-		CSE = 3,
-	}
-
 	public enum TGender {
 		Male,
 		Female,
