@@ -499,7 +499,7 @@ namespace SQLinqenlot {
 				string DBName = instance.Database.ToString();
 				string ServerName;
 				long CurrentClientID = DBLocator.ActiveClientID;
-				SyntacClient client;
+				GenericClient client;
 				try {
 					DBLocator.ActiveClientID = ClientID;
 					ServerName = DBLocator.getDatabaseServer(ref DBName);
@@ -1935,7 +1935,7 @@ namespace SQLinqenlot {
 		}
 		private static DESKeys GetActiveClientDESKeys() {
 			if (!DESKeyCache.ContainsKey(DBLocator.ActiveClientID)) {
-				string fileName = "C:\\Syntac\\ClientKeys\\{0}.key".Fmt(DBLocator.ActiveClientName);
+				string fileName = "C:\\SQLinqenlot\\ClientKeys\\{0}.key".Fmt(DBLocator.ActiveClientName);
 				if (!File.Exists(fileName)) {
 					if (!Directory.Exists(Path.GetDirectoryName(fileName)))
 						Directory.CreateDirectory(Path.GetDirectoryName(fileName));

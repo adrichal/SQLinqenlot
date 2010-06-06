@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SyntacUtils")]
+[assembly: AssemblyTitle("SQLinqenlot")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Early Intervention Software Systems")]
-[assembly: AssemblyProduct("SyntacUtils")]
-[assembly: AssemblyCopyright("Copyright © Early Intervention Software Systems 2009")]
+[assembly: AssemblyCompany("Expernential")]
+[assembly: AssemblyProduct("SQLinqenlot")]
+[assembly: AssemblyCopyright("Open Source Software according to the MIT/X license")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("39c0dadb-c2a8-404e-a1e7-8933b2bb5ef8")]
+[assembly: Guid("46970159-37F9-461c-A468-5CE54A6B71F8")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -32,7 +32,7 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.0.0.*")]
+[assembly: AssemblyFileVersion("1.0.0.1")]
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("TestProject")]

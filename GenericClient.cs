@@ -8,8 +8,8 @@ namespace SQLinqenlot {
 	/// <summary>
 	/// Summary description for Client.
 	/// </summary>
-	public class SyntacClient : GenericTable {
-		static SyntacClient() {
+	public class GenericClient : GenericTable {
+		static GenericClient() {
 			__EntsByFeatureUser = new Dictionary<string, Dictionary<string, bool>>();
 		}
 		public enum EntitlementType {
@@ -17,7 +17,7 @@ namespace SQLinqenlot {
 			DefaultNegative = 2
 		}
 
-		public SyntacClient()
+		public GenericClient()
 			: base("Client", TDatabase.Shared) {
 		}
 
@@ -104,11 +104,11 @@ namespace SQLinqenlot {
 		#endregion accessors
 
 		private static CachedQuery mCachedQuery;
-		private static List<SyntacClient> mClientCache;
-		public static List<SyntacClient> ClientCache {
+		private static List<GenericClient> mClientCache;
+		public static List<GenericClient> ClientCache {
 			get {
 				if (mCachedQuery == null) {
-					mClientCache = new List<SyntacClient>();
+					mClientCache = new List<GenericClient>();
 					CachedQuery.CacheUpdatedDelegate cb = new CachedQuery.CacheUpdatedDelegate(CacheCB);
 					mCachedQuery = new CachedQuery(TDatabase.Shared, "select * from Client order by ID", 60, cb);
 				}
@@ -122,7 +122,7 @@ namespace SQLinqenlot {
 		/// Default does not force refresh of cached list
 		/// </summary>
 		/// <returns></returns>
-		public static List<SyntacClient> GetActiveClients() {
+		public static List<GenericClient> GetActiveClients() {
 			return GetActiveClients(false);
 		}
 
@@ -131,12 +131,12 @@ namespace SQLinqenlot {
 		/// </summary>
 		/// <param name="ForceRefresh">to get whats in client table now.</param>
 		/// <returns></returns>
-		public static List<SyntacClient> GetActiveClients(bool ForceRefresh) {
+		public static List<GenericClient> GetActiveClients(bool ForceRefresh) {
 			if (ForceRefresh)
 				mCachedQuery = null;
 
-			List<SyntacClient> ar = new List<SyntacClient>();
-			foreach (SyntacClient c in ClientCache) {
+			List<GenericClient> ar = new List<GenericClient>();
+			foreach (GenericClient c in ClientCache) {
 				if (c.Active == (byte)TClientStatus.Active)
 					ar.Add(c);
 			}
@@ -147,7 +147,7 @@ namespace SQLinqenlot {
 			mClientCache.Clear();
 
 			foreach (DataRow r in dt.Rows) {
-				SyntacClient c = new SyntacClient();
+				GenericClient c = new GenericClient();
 				c.Load(r);
 				mClientCache.Add(c);
 			}
@@ -163,8 +163,8 @@ namespace SQLinqenlot {
 			return base.ProtectedCreateRecord(force);
 		}
 
-		public static SyntacClient GetByID(long ClientID) {
-			foreach (SyntacClient c in ClientCache) {
+		public static GenericClient GetByID(long ClientID) {
+			foreach (GenericClient c in ClientCache) {
 				if (c.ID == ClientID)
 					return c;
 			}
@@ -172,14 +172,14 @@ namespace SQLinqenlot {
 			return null;
 		}
 
-		public static SyntacClient GetByName(string ClientName) {
+		public static GenericClient GetByName(string ClientName) {
 			ClientName = (ClientName ?? "").ToLower();
 			return ClientCache.Where(c => c.Name.ToLower() == ClientName).SingleOrDefault();
 		}
 
 		public static SortedList<string, string> GetAllClientNames() {
 			SortedList<string, string> Result = new SortedList<string, string>();
-			foreach (SyntacClient c in ClientCache) {
+			foreach (GenericClient c in ClientCache) {
 				Result.Add(c.Name, c.Name);
 			}
 			return Result;
@@ -189,14 +189,14 @@ namespace SQLinqenlot {
 		/// <summary>
 		/// is client entitled to  feature. Entitlements work two ways - eaither by Default On or by Default Off.
 		/// If default is on, then A feature is turned off by having the client name in the list for this "feature/NotEntiled" app parm 
-		/// in the EISS table or having this feature appear in the client's AppParm "Setup/feature_NotEntitled" (which is created by SetupClient)
+		/// in the shared table or having this feature appear in the client's AppParm "Setup/feature_NotEntitled" (which is created by SetupClient)
 		/// if the default is off, the a client has a feature truned on by having the client name in the app parm "feature/Entiled" in the
-		/// EISS table or the or having this feature appear in the client's AppParm "Setup/feature_Entitled"
+		/// shared table or the or having this feature appear in the client's AppParm "Setup/feature_Entitled"
 		/// Most features in the system are by default entitled
 		/// </summary>
 		/// <param name="c"></param>
 		/// <returns></returns>
-		public static bool Entitled(string feature, SyntacClient c, EntitlementType EntType) {
+		public static bool Entitled(string feature, GenericClient c, EntitlementType EntType) {
 			string cname = c.Name.ToLower();
 
 			string ParmName;
@@ -215,7 +215,7 @@ namespace SQLinqenlot {
 				ents = new Dictionary<string, bool>();
 				__EntsByFeatureUser[feature] = ents;
 
-				//this parm that should only exist on EISS level
+				//this parm that should only exist on shared level
 				string str = ApplicationParameters.GetParm(feature, ParmName);
 				if (str != null) {
 					str = str.ToLower();

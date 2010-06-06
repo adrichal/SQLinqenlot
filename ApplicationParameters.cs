@@ -16,7 +16,7 @@ namespace SQLinqenlot {
 		App1 	p1		app1's p1
 
 
-		RMSC DB
+		Shared DB
 		App		parm	value
 		Global	p2		p2 is global parm
 
@@ -35,7 +35,7 @@ namespace SQLinqenlot {
 			mAllClientParms.Clear();
 		}
 		/// <summary>
-		/// paramater are gotten from the ApplicationParamater table in the client and RMSC DBs.  the client DB can have values that are global to that client or
+		/// paramater are gotten from the ApplicationParamater table in the client and Shared DBs.  the client DB can have values that are global to that client or
 		/// parms for spcific application.  
 		/// </summary>
 		private static void LoadParms() {
@@ -54,10 +54,10 @@ namespace SQLinqenlot {
 
 			SqlUtil sql = new SqlUtil(TDatabase.Client);
 			string TableName = "ApplicationParameter";
-			//need to specila case RMSC since the applicationparater table in RMSC is used for default values for all client for all apps
-			//the problem is RMSC has aps of its own that its needs to configure.
-			if (DBLocator.ActiveClientName == "RMSC")
-				TableName = "RMSC_" + TableName;
+			//need to specila case Shared since the applicationparater table in Shared is used for default values for all client for all apps
+			//the problem is Shared has aps of its own that its needs to configure.
+			if (DBLocator.ActiveClientName == "Shared")
+				TableName = "Shared_" + TableName;
 
 			DataTable dt = sql.ExecuteSingleResultSetSQLQuery("select * from " + TableName + " order by App");
 
@@ -83,7 +83,7 @@ namespace SQLinqenlot {
 				dict[parm.ToLower()] = val;
 			}
 
-			//go to EISS and only get the GLOBAL
+			//go to shared db and only get the GLOBAL
 			sql = new SqlUtil(TDatabase.Shared);
 			dt = sql.ExecuteSingleResultSetSQLQuery("select * from ApplicationParameter");
 			foreach (DataRow r in dt.Rows) {
@@ -100,7 +100,7 @@ namespace SQLinqenlot {
 						mParms[AppName] = dict;
 					}
 
-					//dont allow parms found in the RMSC app parms table to override client settings
+					//dont allow parms found in the shared app parms table to override client settings
 					if (dict.ContainsKey(parm))
 						continue;
 				}
@@ -120,7 +120,7 @@ namespace SQLinqenlot {
 
 		/// <summary>
 		/// Gets a parmater based on the application name and paramaters name
-		/// First it checks application, then client shared, and then RMSC global
+		/// First it checks application, then client shared, and then shared global
 		/// </summary>
 		/// <param name="AppName"></param>
 		/// <param name="ParmName"></param>

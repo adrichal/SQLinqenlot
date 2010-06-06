@@ -15,13 +15,13 @@ namespace SQLinqenlot {
 		static DBLocator() {
 			__ServerMap = new UniStatic<DataTable>();
 			__SyncLock = new UniStatic<object>();
-			__ActiveClient = new UniStatic<SyntacClient>();
+			__ActiveClient = new UniStatic<GenericClient>();
 		}
 
 		private static UniStatic<DataTable> __ServerMap;
 		private static DataTable ServerMap {
-			get { 
-				return __ServerMap.Value; 
+			get {
+				return __ServerMap.Value;
 			}
 			set { __ServerMap.Value = value; }
 		}
@@ -31,7 +31,7 @@ namespace SQLinqenlot {
 			get {
 				if (__SyncLock.Value == null)
 					__SyncLock.Value = new object();
-				return __SyncLock.Value; 
+				return __SyncLock.Value;
 			}
 		}
 
@@ -57,7 +57,7 @@ namespace SQLinqenlot {
 			set {
 				lock (SyncLock) {
 					if (ActiveClientID != value) {
-						var newClient = SyntacClient.GetByID(value);
+						var newClient = GenericClient.GetByID(value);
 						if (newClient == null)
 							throw new InvalidOperationException("Invalid Client ID: " + value.ToString());
 						ActiveClient = newClient;
@@ -66,8 +66,8 @@ namespace SQLinqenlot {
 			}
 		}
 
-		private static UniStatic<SyntacClient> __ActiveClient;
-		public static SyntacClient ActiveClient {
+		private static UniStatic<GenericClient> __ActiveClient;
+		public static GenericClient ActiveClient {
 			get {
 				return __ActiveClient.Value;
 			}
@@ -83,7 +83,7 @@ namespace SQLinqenlot {
 			set {
 				lock (SyncLock) {
 					if (ActiveClient == null || ActiveClient.Name != value) {
-						SyntacClient c = SyntacClient.GetByName(value);
+						GenericClient c = GenericClient.GetByName(value);
 						if (c == null) {
 							throw new ApplicationException("Invalid Client Name: " + value);
 						}
@@ -117,7 +117,7 @@ namespace SQLinqenlot {
 		/// (Client specific db's like poc or GECS may have client specific names lile CITI_GECS.
 		/// 
 		/// First check for presence of a reg value for this specific DB. If not found...
-		/// Second, check  DatabaseMap table in Syntac db for a row that matches our Client and the db we want. If not found
+		/// Second, check  DatabaseMap table in SharedDB db for a row that matches our Client and the db we want. If not found
 		/// Third, check for default (non-client specific, id=0) mapping for a db (this is what will happen for all GLOBAL db's). 
 		/// </summary>
 		/// <param name="databaseName">Logical name of database. For client db's will change it to actual name</param>
@@ -127,54 +127,24 @@ namespace SQLinqenlot {
 			if (databaseName == null)
 				throw new NoNullAllowedException("Database name cannot be null.");
 
-			string dbServer = null;
-
-			try {
-				//Check registry for local overides
-				dbServer = getServerNameFromRegistry(ref databaseName, true);
-			} catch (System.SystemException SE) {
-				//Attempt to catch all the ex's that can happen when opening a reg value.
-				throw new System.SystemException("Unable to read DB registry value. " + SE.Message, SE);
-			} catch {
-				/*	A general exception is thrown by the Reg Util if the value specified does not exist.
-					Assuming this is not an error; there just is no reg entry for this dv.				
-					Now then we must look for an entry for the main Syntac database, the source of all db information in the world.
-					From it we will populate a local cache of the table. 
-				*/
-				lock (SyncLock) {
-					if (ServerMap == null) {
-						populateServerTable();
-					}
+			lock (SyncLock) {
+				if (ServerMap == null) {
+					populateServerTable();
 				}
+			}
+			if (databaseName.ToLower() == "shared") {
+				var sharedDB = GetSharedDBLocation();
+				databaseName = sharedDB.DatabaseName;
+				return sharedDB.ServerName;
+			}
+			//lookup will also translate logicalName to actual name
+			var dbServer = serverLookup(ref databaseName, ActiveClientName);
 
-				//lookup will also translate logicalName to actual name
-				dbServer = serverLookup(ref databaseName, ActiveClientName);
-
-				if (dbServer == null) {
-					throw new ApplicationException("Database not found Exception.");
-				}
+			if (dbServer == null) {
+				throw new ApplicationException("Database not found Exception.");
 			}
 
 			return dbServer;
-		}
-
-		private static string getServerNameFromRegistry(ref string dbName, bool causeException) {
-			string KeyPath = @"Software\Syntac\Database\" + dbName;
-			string ActualDBName = RegistryUtility.GetRegistryValueAsString(Registry.LocalMachine, KeyPath, "ActualDBName", false);
-			if (!string.IsNullOrEmpty(ActualDBName))
-				dbName = ActualDBName;
-			return RegistryUtility.GetRegistryValueAsString(Registry.LocalMachine, KeyPath, "Location", causeException);
-		}
-
-		private const string CLIENT_NAME_REG_KEY = @"Software\Syntac\";
-		private const string CLIENT_NAME_REG_VALUE = "ActiveClient";
-
-		public static string getClientNameFromRegistry() {
-			return RegistryUtility.GetRegistryValueAsString(Registry.LocalMachine, CLIENT_NAME_REG_KEY, CLIENT_NAME_REG_VALUE, false);
-		}
-
-		public static void setClientNameInRegistry(string ClientName) {
-			RegistryUtility.SetRegistryValue(Registry.LocalMachine, CLIENT_NAME_REG_KEY, CLIENT_NAME_REG_VALUE, ClientName);
 		}
 
 		/// <summary>
@@ -183,32 +153,36 @@ namespace SQLinqenlot {
 		/// <param name="dbServer"></param>
 		private static void populateServerTable() {
 			SqlDataAdapter da;
-			string SyntacDBServer = null;
 			string connectionString = null;
 
 			string sqlString = "SELECT dbsm.*, c.[Name] AS clientName"
 				+ " FROM DatabaseServerMap dbsm"
 				+ " JOIN Client c ON dbsm.ClientID = c.ID";
 
-			//need Syntac global db server name 
-			string SyntacDbName = "Syntac";
-			try {
-				if ((SyntacDBServer = getServerNameFromRegistry(ref SyntacDbName, false)) == null) {
-					throw new Exception("Could not determine Syntac DB Server master configuration.");
-				}
-			} catch (System.SystemException SE) {
-				throw new System.SystemException("Unable to read registry value for Syntac db. " + SE.Message, SE);
-			}
+			//need SharedDB global db server name 
+			var sharedDBLocation = GetSharedDBLocation();
+			if (sharedDBLocation.ServerName == "" || sharedDBLocation.DatabaseName == "")
+				throw new Exception("Could not determine SharedDB DB Server master configuration.");
 
-			//			connectionString = "Application Name= DB Locator service; server=" + SyntacDBServer + ";" + "UID=sa;PWD=r3c0^3r7;" + "Database=Syntac";
 			string DBCredentials = "trusted_Connection=yes;";
-			connectionString = string.Format("Application Name= DB Locator service; server={0};{1}Database={2}", SyntacDBServer, DBCredentials, SyntacDbName);
+			connectionString = string.Format("Application Name= DB Locator service; server={0};{1}Database={2}", sharedDBLocation.ServerName, DBCredentials, sharedDBLocation.DatabaseName);
 			connectionString = SqlUtil.FixConnectionString(connectionString);
 			ServerMap = new System.Data.DataTable("ServerMap");
 			da = new SqlDataAdapter(sqlString, connectionString);
 			da.Fill(ServerMap);
 			da.Dispose();
+		}
 
+		private static DBLocation GetSharedDBLocation() {
+			var x = ConfigurationManager.AppSettings;
+			var server = ConfigurationManager.AppSettings.Get("SharedDBServer");
+			var db = ConfigurationManager.AppSettings.Get("SharedDBName");
+			return new DBLocation { ServerName = server, DatabaseName = db };
+		}
+
+		public struct DBLocation {
+			public string ServerName;
+			public string DatabaseName;
 		}
 
 		/// <summary>
@@ -272,8 +246,8 @@ namespace SQLinqenlot {
 			string pSz;
 			byte xPSz;
 
-			if ((pSz = RegistryUtility.GetRegistryValueAsString(Registry.LocalMachine, "Software\\Syntac\\Database\\" + dbName, x.ToString() + " Connections", false)) == null) {
-				if ((pSz = RegistryUtility.GetRegistryValueAsString(Registry.LocalMachine, "Software\\Syntac\\Database", x.ToString() + " Connections", false)) == null) {
+			if ((pSz = RegistryUtility.GetRegistryValueAsString(Registry.LocalMachine, "Software\\SharedDB\\Database\\" + dbName, x.ToString() + " Connections", false)) == null) {
+				if ((pSz = RegistryUtility.GetRegistryValueAsString(Registry.LocalMachine, "Software\\SharedDB\\Database", x.ToString() + " Connections", false)) == null) {
 					//for better program flow just convert this to string for now
 					pSz = x == PoolSize.Max ? System.Convert.ToString(MAX_POOL_SIZE) : System.Convert.ToString(MIN_POOL_SIZE);
 				}

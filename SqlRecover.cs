@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Reflection;
 using Microsoft.Win32;
+using System.Configuration;
 
 namespace SQLinqenlot {
 	/// <summary>
@@ -15,9 +16,8 @@ namespace SQLinqenlot {
 		private static string mDir = null;
 		public static string GetRecoverDir() {
 			if (mDir == null) {
-				string d = RegistryUtility.GetRegistryValueAsString(Registry.LocalMachine, @"Software\Syntac",
-						"RecoveryDir", false);
-				if (d == null)
+				string d = ConfigurationManager.AppSettings.Get("RecoveryDir");
+				if (string.IsNullOrEmpty(d))
 					d = @"c:\temp\recovery\";
 
 				DirectoryInfo di = new DirectoryInfo(d);

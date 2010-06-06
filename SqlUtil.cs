@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Threading;
 using System.Diagnostics;
+using System.Configuration;
 
 namespace SQLinqenlot {
 
@@ -111,11 +112,6 @@ namespace SQLinqenlot {
 		}
 
 		public static string BuildTablePath(TDatabase db, string table) {
-			/*string svr = Syntac.RegistryUtility.GetRegistryValueAsString(Registry.LocalMachine, 
-				@"Software\Syntac\Database\" + db.ToString(),"Location");
-
-			return svr + "." + db.ToString() + ".dbo." + table;	
-			*/
 			return DBLocator.getTablePath(db, table);
 		}
 
@@ -208,8 +204,8 @@ namespace SQLinqenlot {
 
 				moDBConn = new SqlConnection(msActiveConnectionString);
 			} catch (Exception ex) {
-				//Lets Use The MS Application Block here w/a custom publisher that sends out an eMail & Publishes exception data to a structure in the Syntac Database.
-				//If Syntac DB is not available then publish exception data to the event log.
+				//Lets Use The MS Application Block here w/a custom publisher that sends out an eMail & Publishes exception data to a structure in the Shared Database.
+				//If Shared DB is not available then publish exception data to the event log.
 				throw new Exception(ex.Message, ex);
 			}
 		}
@@ -722,13 +718,13 @@ namespace SQLinqenlot {
 					}
 				} catch (SqlException sqlEx) {
 					SaveException = (Exception)sqlEx;
-					//Lets Use The MS Application Block here w/a custom publisher that sends out an eMail & Publishes exception data to a structure in the Syntac Database.
-					//If Syntac DB is not available then publish exception data to the event log.
+					//Lets Use The MS Application Block here w/a custom publisher that sends out an eMail & Publishes exception data to a structure in the Shared Database.
+					//If Shared DB is not available then publish exception data to the event log.
 					throw sqlEx;
 				} catch (Exception ex) {
 					SaveException = ex;
-					//Lets Use The MS Application Block here w/a custom publisher that sends out an eMail & Publishes exception data to a structure in the Syntac Database.
-					//If Syntac DB is not available then publish exception data to the event log.
+					//Lets Use The MS Application Block here w/a custom publisher that sends out an eMail & Publishes exception data to a structure in the Shared Database.
+					//If Shared DB is not available then publish exception data to the event log.
 					throw new Exception(ex.Message, ex);
 				} finally {
 					if (SaveException != null)
@@ -824,14 +820,14 @@ namespace SQLinqenlot {
 					mbDevelChecked = true;
 					mbIsDevel = false;
 					try {
-						mbIsDevel = DataUtils.ToBool(RegistryUtility.GetRegistryValueAsString(Registry.LocalMachine, @"Software\Syntac", "Devel"));
-						//mbIsDevel = Convert.ToBoolean(Registry.LocalMachine.OpenSubKey(@"Software\Datanet", false).GetValue("Devel"));
+						var dev = ConfigurationManager.AppSettings.Get("dev");
+						mbIsDevel = DataUtils.ToBool(dev);
 					} catch { }
 				}
 			}
 
 			if (mbIsDevel)
-				ConnStr = ConnStr.Replace("trusted_Connection=yes;", "UID=Syntac-ro;PWD=readonly;");
+				ConnStr = ConnStr.Replace("trusted_Connection=yes;", "UID=shared-ro;PWD=readonly;");
 			return ConnStr;
 		}
 

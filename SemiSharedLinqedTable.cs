@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace SQLinqenlot {
 	/// <summary>
-	/// A SemiSharedLinqedTable is a LinqedTable that splits its data between the Syntac database (shared, read-only) 
+	/// A SemiSharedLinqedTable is a LinqedTable that splits its data between the Shared database (shared, read-only) 
 	/// and the Client database (writable).  It must be bound to a view that joins the two tables' data in a union,
 	/// with the field IsClientData denoting whether the data belongs to the client.
 	/// </summary>
